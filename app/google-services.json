@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "638202998520",
+    "firebase_url": "https://iot-with-asistant.firebaseio.com",
+    "project_id": "iot-with--asistant",
+    "storage_bucket": "iot-with--asistant.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:638202998520:android:2807d5cb09b62ee074550d",
+        "android_client_info": {
+          "package_name": "com.iot.iotgoogleassistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "638202998520-gdponi25g6rl20gl386kihru1psfn8ia.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.iot.iotgoogleassistant",
+            "certificate_hash": "269f525e0ffb22a2b4578697b900438c7b080d2f"
+          }
+        },
+        {
+          "client_id": "638202998520-v629al9oo65684itk0e9b7akou3oe5v3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlUVpvnwa0REWo-jTvnV02h16JO72gVbs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "638202998520-v629al9oo65684itk0e9b7akou3oe5v3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,79 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+   <TextView
+       android:id="@+id/text"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:textSize="30sp"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+
+
+   <ImageView
+       android:id="@+id/speak"
+       android:layout_width="59dp"
+       android:layout_height="72dp"
+       android:background="?selectableItemBackground"
+       android:contentDescription="TODO"
+       android:src="@android:drawable/ic_btn_speak_now"
+       app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintStart_toStartOf="parent" />
+
+   <Switch
+       android:id="@+id/relay1"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="40dp"
+       android:text="Relay 1"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintHorizontal_bias="0.048"
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toTopOf="parent" />
+
+   <TextView
+       android:id="@+id/textView2"
+       android:layout_width="73dp"
+       android:layout_height="32dp"
+       android:layout_marginTop="40dp"
+       android:text="TextView"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintHorizontal_bias="0.348"
+       app:layout_constraintStart_toEndOf="@+id/relay1"
+       app:layout_constraintTop_toTopOf="parent" />
+
+   <Switch
+       android:id="@+id/relay2"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_marginStart="16dp"
+       android:layout_marginLeft="16dp"
+       android:layout_marginTop="32dp"
+       android:text="Relay 2 "
+       app:layout_constraintStart_toStartOf="parent"
+       app:layout_constraintTop_toBottomOf="@+id/relay1" />
+
+   <TextView
+       android:id="@+id/temperature"
+       android:layout_width="111dp"
+       android:layout_height="35dp"
+       android:layout_marginStart="80dp"
+       android:layout_marginLeft="80dp"
+       android:layout_marginTop="24dp"
+       android:text="temperature"
+       app:layout_constraintEnd_toEndOf="parent"
+       app:layout_constraintHorizontal_bias="0.0"
+       app:layout_constraintStart_toEndOf="@+id/relay2"
+       app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
