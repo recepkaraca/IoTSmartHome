@@ -11,4 +11,6 @@
     <color name="colorGradientStart">#12c2e9</color>
     <color name="colorGradientCenter">#c471ed</color>
     <color name="colorGradientEnd">#f64f59</color>
+
+    <color name="colorCardView">#AFFFFFFF</color>
 </resources>

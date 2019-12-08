@@ -18,6 +18,10 @@
         </activity>
         <activity android:name=".MainActivity">
         </activity>
+        <activity android:name=".RelayControlActivity">
+        </activity>
+        <activity android:name=".AirConditionControlActivity">
+        </activity>
     </application>
 
 </manifest>

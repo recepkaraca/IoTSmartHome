@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_animation"
-    android:id="@+id/root_layout"
+    android:id="@+id/login_root_layout"
     tools:context=".LoginActivity">
 
 
@@ -23,7 +23,9 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="52dp"
         app:srcCompat="@drawable/smarthome"
-        tools:srcCompat="@drawable/smarthome" />
+        tools:srcCompat="@drawable/smarthome"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="52dp" />
 
     <EditText
         android:id="@+id/username"

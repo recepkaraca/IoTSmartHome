@@ -3,16 +3,13 @@ package com.iot.iotgoogleassistant;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-import android.app.ActionBar;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.AlphaAnimation;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,9 +19,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        System.out.println("sadasd");
 
-        AnimationDrawable animationDrawable = ((AnimationDrawable) findViewById(R.id.root_layout).getBackground());
+        AnimationDrawable animationDrawable = ((AnimationDrawable) findViewById(R.id.login_root_layout).getBackground());
         animationDrawable.setEnterFadeDuration(10);
         animationDrawable.setExitFadeDuration(2000);
         animationDrawable.start();
@@ -34,7 +30,6 @@ public class LoginActivity extends AppCompatActivity {
         //String username = "recepkaraca";
         //String password = "123456";
         //db.insertData(username, password);
-        final AlphaAnimation buttonClick = new AlphaAnimation(1F, 0.8F);
         CardView btn = findViewById(R.id.login_btn);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,7 +54,8 @@ public class LoginActivity extends AppCompatActivity {
                         Session.isAdmin = false;
                         Toast.makeText(getApplicationContext(), "Ordinary account.", Toast.LENGTH_LONG).show();
                     }
-
+                    Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(i);
                 }
             }
         });
