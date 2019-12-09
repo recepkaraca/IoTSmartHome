@@ -29,11 +29,56 @@ public class MainActivity extends AppCompatActivity {
         animationDrawable.setExitFadeDuration(2000);
         animationDrawable.start();
 
-        CardView btn = findViewById(R.id.relay_control_btn);
-        btn.setOnClickListener(new View.OnClickListener() {
+        CardView btn1 = findViewById(R.id.relay_control_btn);
+        btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, RelayControlActivity.class);
+                startActivity(i);
+            }
+        });
+
+        CardView btn2 = findViewById(R.id.air_condition_control_btn);
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, AirConditionControlActivity.class);
+                startActivity(i);
+            }
+        });
+
+        CardView btn3 = findViewById(R.id.pir_control_btn);
+        btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, PirControlActivity.class);
+                startActivity(i);
+            }
+        });
+
+        CardView btn4 = findViewById(R.id.assistant_control_btn);
+        btn4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, AssistantActivity.class);
+                startActivity(i);
+            }
+        });
+
+        CardView btn5 = findViewById(R.id.lcd_control_btn);
+        btn5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, LCDControlActivity.class);
+                startActivity(i);
+            }
+        });
+
+        CardView btn6 = findViewById(R.id.account_control_btn);
+        btn6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, AccountControlActivity.class);
                 startActivity(i);
             }
         });

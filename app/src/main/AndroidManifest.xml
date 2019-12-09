@@ -22,6 +22,16 @@
         </activity>
         <activity android:name=".AirConditionControlActivity">
         </activity>
+        <activity android:name=".PirControlActivity">
+        </activity>
+        <activity android:name=".AssistantActivity">
+        </activity>
+        <activity android:name=".LCDControlActivity">
+        </activity>
+        <activity android:name=".AccountControlActivity">
+        </activity>
+        <activity android:name=".RegisterActivity">
+        </activity>
     </application>
 
 </manifest>

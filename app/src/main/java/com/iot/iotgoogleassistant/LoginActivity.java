@@ -17,6 +17,13 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // DELETE THIS
+        Session.isLoggedIn = true;
+        Session.isAdmin = true;
+        Session.username = "recepkaraca";
+        Intent i = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(i);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 

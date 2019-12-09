@@ -52,4 +52,15 @@ public class Database extends SQLiteOpenHelper {
         }
         db.close();
     }
+
+    public void insertDataAdmin(String username){
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            ContentValues cv = new ContentValues();
+            cv.put(ROW_USERNAME, username);
+            db.insert(TABLE_ADMINS, null, cv);
+        } catch (Exception e) {
+        }
+        db.close();
+    }
 }
