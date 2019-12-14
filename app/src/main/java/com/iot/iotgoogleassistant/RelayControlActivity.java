@@ -70,7 +70,7 @@ public class RelayControlActivity extends AppCompatActivity {
 
     protected void addListener() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        final DatabaseReference reference = firebaseDatabase.getReference();
+        final DatabaseReference reference = firebaseDatabase.getReference("relay");
         reference.child("relay1").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -158,7 +158,7 @@ public class RelayControlActivity extends AppCompatActivity {
 
     protected void setValueFirebase(String relay, int value) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference(relay);
+        DatabaseReference ref = database.getReference("relay").child(relay);
         ref.setValue(Integer.toString(value));
     }
 }

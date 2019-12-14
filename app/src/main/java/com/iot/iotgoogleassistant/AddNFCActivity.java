@@ -1,8 +1,6 @@
 package com.iot.iotgoogleassistant;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -13,37 +11,44 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
-public class RegisterActivity extends AppCompatActivity {
+import java.util.regex.Pattern;
+
+public class AddNFCActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if(!Session.isLoggedIn) {
             Toast.makeText(getApplicationContext(), "Unauthorized access.", Toast.LENGTH_LONG).show();
-            Intent i = new Intent(RegisterActivity.this, LoginActivity.class);
+            Intent i = new Intent(AddNFCActivity.this, LoginActivity.class);
             startActivity(i);
         }
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_add_nfc);
 
-        AnimationDrawable animationDrawable = ((AnimationDrawable) findViewById(R.id.register_root_layout).getBackground());
+        AnimationDrawable animationDrawable = ((AnimationDrawable) findViewById(R.id.add_nfc_root_layout).getBackground());
         animationDrawable.setEnterFadeDuration(10);
         animationDrawable.setExitFadeDuration(2000);
         animationDrawable.start();
 
-        CardView btn = findViewById(R.id.register_login_btn);
+        CardView btn = findViewById(R.id.add_nfc_btn);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = ((TextView)findViewById(R.id.register_username)).getText().toString();
-                String password = ((TextView)findViewById(R.id.register_password)).getText().toString();
-                Database db = new Database(RegisterActivity.this);
-                db.insertData(username, password);
-                db.close();
-                Intent i = new Intent(RegisterActivity.this, AccountControlActivity.class);
-                startActivity(i);
-                Toast.makeText(getApplicationContext(), "Operation successfull.", Toast.LENGTH_LONG).show();
-                finish();
+                String cardID = ((TextView)findViewById(R.id.add_nfc_id)).getText().toString();
+                String pattern = "[0-9A-F]{1}[0-9A-F]{1}:[0-9A-F]{1}[0-9A-F]{1}:[0-9A-F]{1}[0-9A-F]{1}:[0-9A-F]{1}[0-9A-F]{1}";
+                boolean isMatch = Pattern.matches(pattern, cardID);
+                if(isMatch) {
+                    Database db = new Database(AddNFCActivity.this);
+                    db.insertDataNFC(cardID, Session.username);
+                    db.close();
+                    Intent i = new Intent(AddNFCActivity.this, AccountControlActivity.class);
+                    startActivity(i);
+                    Toast.makeText(getApplicationContext(), "Operation successfull.", Toast.LENGTH_LONG).show();
+                    finish();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Card id format is invalid.", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }

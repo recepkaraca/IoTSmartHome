@@ -17,6 +17,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +28,10 @@ public class AccountControlActivity extends AppCompatActivity {
 
     HashSet<String> hashUsername;
     List<String> listUsername;
+    HashSet<String> hashNFC;
+    List<String> listNFC;
     Spinner spinnerUser;
+    Spinner spinnerNFC;
     TextView isAdmin;
     TextView giveRevokeAdminText;
 
@@ -46,10 +52,13 @@ public class AccountControlActivity extends AppCompatActivity {
         animationDrawable.start();
 
         spinnerUser =  findViewById(R.id.users_spinner);
+        spinnerNFC = findViewById(R.id.nfc_spinner);
         isAdmin = findViewById(R.id.is_admin_textview);
         giveRevokeAdminText = findViewById(R.id.account_control_admin_user_btn_textView);
         hashUsername = new HashSet<>();
+        hashNFC = new HashSet<>();
         getUsers();
+        getNFC();
         addListener();
     }
 
@@ -71,6 +80,28 @@ public class AccountControlActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, listUsername);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUser.setAdapter(adapter);
+    }
+
+    protected void getNFC() {
+        hashNFC.clear();
+        Database db = new Database(AccountControlActivity.this);
+        SQLiteDatabase sqLiteDatabase = db.getWritableDatabase();
+        Cursor c = sqLiteDatabase.rawQuery("SELECT * FROM nfc", null);
+        System.out.println(c.getCount());
+        if (c.moveToFirst()){
+            do {
+                String nfcID = c.getString(0);
+                String nfcUsername = c.getString(1);
+                hashNFC.add(nfcID + "-" + nfcUsername);
+            } while(c.moveToNext());
+        }
+        c.close();
+        db.close();
+
+        listNFC = new ArrayList<>(hashNFC);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, listNFC);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerNFC.setAdapter(adapter);
     }
 
     protected void addListener() {
@@ -106,6 +137,7 @@ public class AccountControlActivity extends AppCompatActivity {
                 if(Session.isAdmin){
                     Intent i = new Intent(AccountControlActivity.this, RegisterActivity.class);
                     startActivity(i);
+                    finish();
                 }else {
                     Toast.makeText(getApplicationContext(), "You're not admin.", Toast.LENGTH_LONG).show();
                 }
@@ -117,15 +149,19 @@ public class AccountControlActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(Session.isAdmin){
-                    Database db = new Database(AccountControlActivity.this);
-                    SQLiteDatabase sqLiteDatabase = db.getWritableDatabase();
-                    if(isAdmin.getText().toString().endsWith("YES")){
-                        sqLiteDatabase.execSQL("DELETE FROM admins WHERE username = '" + spinnerUser.getSelectedItem().toString() + "'");
-                        sqLiteDatabase.execSQL("DELETE FROM users WHERE username = '" + spinnerUser.getSelectedItem().toString() + "'");
+                    if(spinnerUser.getSelectedItem() != null) {
+                        Database db = new Database(AccountControlActivity.this);
+                        SQLiteDatabase sqLiteDatabase = db.getWritableDatabase();
+                        if (isAdmin.getText().toString().endsWith("YES")) {
+                            sqLiteDatabase.execSQL("DELETE FROM admins WHERE username = '" + spinnerUser.getSelectedItem().toString() + "'");
+                            sqLiteDatabase.execSQL("DELETE FROM users WHERE username = '" + spinnerUser.getSelectedItem().toString() + "'");
+                        } else {
+                            sqLiteDatabase.execSQL("DELETE FROM users WHERE username = '" + spinnerUser.getSelectedItem().toString() + "'");
+                        }
+                        sqLiteDatabase.close();
                     }else {
-                        sqLiteDatabase.execSQL("DELETE FROM users WHERE username = '" + spinnerUser.getSelectedItem().toString() + "'");
+                        Toast.makeText(getApplicationContext(), "No user found.", Toast.LENGTH_LONG).show();
                     }
-                    sqLiteDatabase.close();
                 }else {
                     Toast.makeText(getApplicationContext(), "You're not admin.", Toast.LENGTH_LONG).show();
                 }
@@ -138,14 +174,18 @@ public class AccountControlActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(Session.isAdmin){
-                    Database db = new Database(AccountControlActivity.this);
-                    SQLiteDatabase sqLiteDatabase = db.getWritableDatabase();
-                    if(isAdmin.getText().toString().endsWith("YES")){
-                        sqLiteDatabase.execSQL("DELETE FROM admins WHERE username = '" + spinnerUser.getSelectedItem().toString() + "'");
+                    if(spinnerUser.getSelectedItem() != null) {
+                        Database db = new Database(AccountControlActivity.this);
+                        SQLiteDatabase sqLiteDatabase = db.getWritableDatabase();
+                        if (isAdmin.getText().toString().endsWith("YES")) {
+                            sqLiteDatabase.execSQL("DELETE FROM admins WHERE username = '" + spinnerUser.getSelectedItem().toString() + "'");
+                        } else {
+                            db.insertDataAdmin(spinnerUser.getSelectedItem().toString());
+                        }
+                        sqLiteDatabase.close();
                     }else {
-                        db.insertDataAdmin(spinnerUser.getSelectedItem().toString());
+                        Toast.makeText(getApplicationContext(), "No user found.", Toast.LENGTH_LONG).show();
                     }
-                    sqLiteDatabase.close();
                 }else {
                     Toast.makeText(getApplicationContext(), "You're not admin.", Toast.LENGTH_LONG).show();
                 }
@@ -160,8 +200,42 @@ public class AccountControlActivity extends AppCompatActivity {
                 Session.isAdmin = false;
                 Session.isLoggedIn = false;
                 Session.username = "";
+                clearNFCFirebase();
+                setBeepFirebase();
                 Intent i = new Intent(AccountControlActivity.this, LoginActivity.class);
                 startActivity(i);
+            }
+        });
+
+        CardView btn5 = findViewById(R.id.account_control_add_nfc_btn);
+        btn5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(AccountControlActivity.this, AddNFCActivity.class);
+                startActivity(i);
+                finish();
+            }
+        });
+
+        CardView btn6 = findViewById(R.id.account_control_delete_nfc_btn);
+        btn6.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(Session.isAdmin){
+                    if(spinnerNFC.getSelectedItem() != null) {
+                        String selected = spinnerNFC.getSelectedItem().toString();
+                        Database db = new Database(AccountControlActivity.this);
+                        SQLiteDatabase sqLiteDatabase = db.getWritableDatabase();
+                        String[] selectedParsed = selected.split("-");
+                        sqLiteDatabase.execSQL("DELETE FROM nfc WHERE nfc_id = '" + selectedParsed[0] + "'");
+                        sqLiteDatabase.close();
+                    }else {
+                        Toast.makeText(getApplicationContext(), "No card found.", Toast.LENGTH_LONG).show();
+                    }
+                }else {
+                    Toast.makeText(getApplicationContext(), "You're not admin.", Toast.LENGTH_LONG).show();
+                }
+                getNFC();
             }
         });
     }
@@ -187,5 +261,19 @@ public class AccountControlActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         );
+    }
+
+    protected void clearNFCFirebase() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference refID = database.getReference("nfc").child("nfc_id");
+        DatabaseReference refUsername = database.getReference("nfc").child("nfc_username");
+        refID.setValue("");
+        refUsername.setValue("");
+    }
+
+    protected void setBeepFirebase() {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("beep_sound");
+        ref.setValue("1");
     }
 }

@@ -89,7 +89,7 @@ public class AirConditionControlActivity extends AppCompatActivity {
 
     protected void addListener() {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        final DatabaseReference reference = firebaseDatabase.getReference();
+        final DatabaseReference reference = firebaseDatabase.getReference().child("temperature");
         reference.child("min_temperature").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -120,7 +120,7 @@ public class AirConditionControlActivity extends AppCompatActivity {
             }
         });
 
-        reference.child("temperature").addValueEventListener(new ValueEventListener() {
+        reference.child("current_temperature").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.getValue().toString();
@@ -141,8 +141,8 @@ public class AirConditionControlActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Max and min value cannot be empty.", Toast.LENGTH_LONG).show();
         }else{
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference refMin = database.getReference("min_temperature");
-            DatabaseReference refMax = database.getReference("max_temperature");
+            DatabaseReference refMin = database.getReference("temperature").child("min_temperature");
+            DatabaseReference refMax = database.getReference("temperature").child("max_temperature");
 
             if(Double.parseDouble(min) <= Double.parseDouble(max)) {
                 refMin.setValue(min);
