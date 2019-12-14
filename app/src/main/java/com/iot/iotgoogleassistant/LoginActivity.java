@@ -87,6 +87,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     Intent i = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(i);
+                    finish();
                 }
                 if(wrongPassCounter >= 3) {
                     setAlarm("1");
@@ -115,6 +116,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     Intent i = new Intent(LoginActivity.this, MainActivity.class);
                     startActivity(i);
+                    finish();
                 }else {
                     Toast.makeText(getApplicationContext(), "Access Denied.", Toast.LENGTH_SHORT).show();
                 }
@@ -132,10 +134,10 @@ public class LoginActivity extends AppCompatActivity {
         SQLiteDatabase sqLiteDatabase = db.getWritableDatabase();
         Cursor resAdmin = sqLiteDatabase.rawQuery("SELECT * FROM admins WHERE username = '" + username + "'", null);
         if(resAdmin.getCount() != 0) {
-            Toast.makeText(getApplicationContext(), "Parent account.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Admin account.", Toast.LENGTH_LONG).show();
             return true;
         }else {
-            Toast.makeText(getApplicationContext(), "Ordinary account.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "User account.", Toast.LENGTH_LONG).show();
             return false;
         }
     }

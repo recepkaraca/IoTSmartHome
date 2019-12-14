@@ -24,6 +24,7 @@
 #include <MFRC522.h>
 #include <LiquidCrystal_I2C.h>
 #include <stdlib.h>
+#include <math.h>
 
 #define DHTTYPE DHT11
 
@@ -35,12 +36,14 @@
 #define RELAY1 1 // TX
 #define RELAY2 3 // RX
 
-#define DHT_PIN D8 //RXC-3
+#define DHT_PIN D3 //RXC-3
 
 #define SS_PIN D4  //D2
 #define RST_PIN D3 //D1
 
 #define BUZZER D0
+
+#define MOTION_SENSOR D8
 
 
 DHT dht(DHT_PIN, DHTTYPE);
@@ -50,14 +53,24 @@ FirebaseData firebaseData;
 
 String alarm;
 String beep;
+String relay1;
+String relay2;
+float minTemp;
+float maxTemp;
+float currentTemp;
 bool isLogged;
+
+bool isRelay2Locked;
+bool isRelay2Locked2 = false;
+bool isRelay1Locked;
 
 void setup()
 {
-  Serial.begin(9600);
+  //Serial.begin(9600);
   pinMode(RELAY1, OUTPUT);
   pinMode(RELAY2, OUTPUT);
   pinMode(BUZZER, OUTPUT);
+  pinMode(MOTION_SENSOR, INPUT);
 
   wifiConnect();
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
@@ -72,23 +85,14 @@ void setup()
   mfrc522.PCD_Init();
   lcd.init();
   lcd.backlight();
-  /*
-    char str[] = "";
-    lcd.print(str);
-    if(sizeof(str) > 16){
-    for(int i = 0; i < sizeof(str) - 16; i++) {
-      lcd.scrollDisplayLeft();
-      delay(500);
-    }
-    }*/
 }
 
 void loop()
 {
-  isAlarmed();
   if (!isLoggedIn()) {
     // NFC READ
     //////////////////////////
+    isAlarmed();
     lcd.clear();
     lcd.setCursor(0, 0);
     lcd.print("Waiting for NFC");
@@ -157,11 +161,32 @@ void loop()
       }
     }
     lcd.print(nfcUsername);
-    controlRelay();
-  }
 
-  //controlRelay();
-  //saveTempAndHumidity();
+    String lcdBacklight;
+    if (Firebase.getString(firebaseData, "/lcd/lcd_backlight")) {
+      if (firebaseData.dataType() == "string") {
+        lcdBacklight = firebaseData.stringData();
+      }
+    }
+    if(lcdBacklight == "1") {
+      lcd.backlight();
+    }else {
+      lcd.noBacklight();
+    }
+
+    saveTempAndHumidity();
+    readTemps();
+    if (currentTemp <= maxTemp && currentTemp >= minTemp && !isRelay2Locked2) {
+      isRelay2Locked = true;
+      digitalWrite(RELAY2, LOW);
+    } else if(!(currentTemp <= maxTemp && currentTemp >= minTemp) && !isRelay2Locked2){
+      isRelay2Locked = false;
+      digitalWrite(RELAY2, HIGH);
+    }
+    motionSensor();
+    controlRelay();
+    receiveLCDMessage();
+  }
 }
 
 
@@ -186,38 +211,96 @@ void wifiConnect()
 
 void controlRelay() {
   //Serial.print(Firebase.getString("relay1") + "\n");
-  String relay1;
-  if (Firebase.getString(firebaseData, "/relay/relay1")) {
+  if (Firebase.getString(firebaseData, "/relay/relay1") && !isRelay1Locked) {
     if (firebaseData.dataType() == "string") {
       relay1 = firebaseData.stringData();
     }
+    digitalWrite(RELAY1, abs(relay1.toInt() - 1));
   }
-  String relay2;
-  if (Firebase.getString(firebaseData, "/relay/relay2")) {
+
+  if (Firebase.getString(firebaseData, "/relay/relay2") && !isRelay2Locked) {
     if (firebaseData.dataType() == "string") {
       relay2 = firebaseData.stringData();
     }
+    if(relay2 == "1"){
+      isRelay2Locked2 = true;
+    }else {
+      isRelay2Locked2 = false;
+    }
+    digitalWrite(RELAY2, abs(relay2.toInt() - 1));
   }
-  digitalWrite(RELAY1, abs(relay1.toInt() - 1));
-  //Serial.print(Firebase.getString("relay2") + "\n");
-  digitalWrite(RELAY2, abs(relay2.toInt() - 1));
 }
 
 
 void saveTempAndHumidity() {
   float h = dht.readHumidity();
   float t = dht.readTemperature();
+  delay(200);
   char tString[10];
   gcvt(t, 10, tString);
-
-  /*
-    Serial.print("Current humidity = ");
-    Serial.print(h);
-    Serial.print("%  ");
-    Serial.print("temperature = ");
-    Serial.print(t);
-    Serial.println("C  ");*/
+  char hString[10];
+  gcvt(h, 10, hString);
   Firebase.setString(firebaseData, "/temperature/current_temperature", tString);
+  Firebase.setString(firebaseData, "/temperature/humidity", hString);
+  currentTemp = t;
+}
+
+void readTemps() {
+  if (Firebase.getString(firebaseData, "/temperature/max_temperature")) {
+    if (firebaseData.dataType() == "string") {
+      maxTemp = firebaseData.stringData().toFloat();
+    }
+  }
+  if (Firebase.getString(firebaseData, "/temperature/min_temperature")) {
+    if (firebaseData.dataType() == "string") {
+      minTemp = firebaseData.stringData().toFloat();
+    }
+  }
+}
+
+void motionSensor() {
+  String enabled;
+  String pirRelay1;
+  if (Firebase.getString(firebaseData, "/pir/pir_enabled")) {
+    if (firebaseData.dataType() == "string") {
+      enabled = firebaseData.stringData();
+    }
+  }
+  if (enabled == "1") {
+    if (Firebase.getString(firebaseData, "/pir/pir_relay1")) {
+      if (firebaseData.dataType() == "string") {
+        pirRelay1 = firebaseData.stringData();
+      }
+      if (pirRelay1 == "1" && (digitalRead(MOTION_SENSOR) == HIGH)) {
+        digitalWrite(RELAY1, LOW);
+      } else {
+        digitalWrite(RELAY1, HIGH);
+      }
+      isRelay1Locked = true;
+    }
+  } else {
+    isRelay1Locked = false;
+  }
+
+}
+
+void receiveLCDMessage() {
+  String message;
+  if (Firebase.getString(firebaseData, "/lcd/lcd_value")) {
+    if (firebaseData.dataType() == "string") {
+      message = firebaseData.stringData();
+      lcd.clear();
+    }
+  }
+  for (int i = 0; i < ceil(message.length() / 32.0f); i++) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print(message.substring(0 + (i * 32), 16 + (i * 32)));
+    lcd.setCursor(0, 1);
+    lcd.print(message.substring(16 + (i * 32), 32 + (i * 32)));
+    delay(2000);
+  }
+
 }
 
 void readRFID() {
@@ -306,8 +389,4 @@ void beepSound() {
   digitalWrite(BUZZER, HIGH);
   delay(100);
   digitalWrite(BUZZER, LOW);
-}
-
-void delayFirebase() {
-  delay(100);
 }

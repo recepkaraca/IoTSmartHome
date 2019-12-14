@@ -26,6 +26,7 @@ public class AirConditionControlActivity extends AppCompatActivity {
     TextView minValueLabel;
     TextView maxValueLabel;
     TextView measuredValueLabel;
+    TextView humidityValueLabel;
     TextView isWorkingLabel;
     Double minValue, maxValue, measuredValue;
 
@@ -50,6 +51,7 @@ public class AirConditionControlActivity extends AppCompatActivity {
         minValueLabel = findViewById(R.id.air_condition_control_min_label);
         maxValueLabel = findViewById(R.id.air_condition_control_max_label);
         measuredValueLabel = findViewById(R.id.air_condition_control_temperature_label);
+        humidityValueLabel = findViewById(R.id.air_condition_control_humidity_label);
         isWorkingLabel = findViewById(R.id.air_condition_control_is_working_label);
         minValue = maxValue = measuredValue = 0.0;
 
@@ -124,9 +126,22 @@ public class AirConditionControlActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 String value = dataSnapshot.getValue().toString();
-                measuredValueLabel.setText("Measured temperature: " + value + "\u00B0" + "C");
+                measuredValueLabel.setText("Current temperature: " + value + "\u00B0" + "C");
                 measuredValue = Double.parseDouble(value);
                 isWorking();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        reference.child("humidity").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String value = dataSnapshot.getValue().toString();
+                humidityValueLabel.setText("Current humidity: " + value + "\u00B0" + "C");
             }
 
             @Override

@@ -78,6 +78,19 @@
                 android:textAlignment="center"
                 android:textColor="#000000"
                 android:textSize="20dp" />
+
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
+
+    <ImageButton
+        android:id="@+id/asssitant_info_btn"
+        android:background="@drawable/ic_info_light"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+         />
+
 </RelativeLayout>
